@@ -1,11 +1,9 @@
 #include <neo/unicode.hpp>
-
-#include <array>
-#include <type_traits>
-
-using namespace std;
+#include <iostream>
 
 int main() {
     neo::unicode u = "Meow";
-    return u.raw().size();
+    std::wcout << u << '\n';
+    // std::cout << u << '\n';
+    return 0;
 }
