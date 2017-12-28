@@ -101,7 +101,7 @@ private:
     // literal. We assume that all string literals are properly encoded. This
     // initialization lends itself to optimization.
     struct literal_data {
-        code_unit_buffer::pointer pointer;
+        const_pointer pointer;
         size_type size;
     };
     // `sso_data` is for the familiar small-string optimization. It stores the
@@ -121,8 +121,6 @@ private:
         // The buffer lies here
         value_type arr[1];
     };
-    static_assert(std::is_trivial<dynamic_data>::value,
-                  "Cannot compile here: dynamic_data is non-trivial!");
 
     /**
      * A union we use to store information about code units. Each field
