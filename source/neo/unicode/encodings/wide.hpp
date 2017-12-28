@@ -1,6 +1,8 @@
 #ifndef NEO_UNICODE_ENCODINGS_WIDE_HPP_INCLUDED
 #define NEO_UNICODE_ENCODINGS_WIDE_HPP_INCLUDED
 
+#include "utf8.hpp"
+
 #ifdef _WIN32
 #include "utf16.hpp"
 #else
@@ -23,18 +25,20 @@ struct wide {
     static const char* get_name() noexcept {
         return underlying::get_name();
     }
-
-    template <typename FromEncoding, typename FromBuffer>
-    static buffer_type encode_from(FromBuffer&& buf) {
-        return encoder<FromEncoding, wide>::encode(buf);
-    }
 };
 
 template <> struct encoding_for_char_type<wchar_t> { using type = wide; };
 
-template <> struct encoder<struct utf8, wide> {
+template <> struct encoder<utf8, wide> {
     static wide::buffer_type do_encode(const char*, std::size_t);
     template <typename FromBuffer> static wide::buffer_type encode(FromBuffer&& buf) {
+        return do_encode(buf.data(), buf.code_unit_size());
+    }
+};
+
+template <> struct encoder<wide, utf8> {
+    static utf8::buffer_type do_encode(const wchar_t*, std::size_t);
+    template <typename FromBuffer> static utf8::buffer_type encode(FromBuffer&& buf) {
         return do_encode(buf.data(), buf.code_unit_size());
     }
 };

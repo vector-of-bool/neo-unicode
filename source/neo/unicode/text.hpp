@@ -79,6 +79,12 @@ public:
         : _buffer(ptr, ptr + std::char_traits<value_type_t<buffer_type>>::length(ptr)) {
     }
 
+    template <typename OtherCharType,
+              typename OtherEncoding = encoding_for_char_type_t<OtherCharType>,
+              typename = std::enable_if_t<!std::is_convertible<OtherCharType*, const_pointer>::value>>
+    basic_text(const OtherCharType* ptr)
+        : _buffer(neo::encoder<OtherEncoding, internal_encoding>::encode(typename OtherEncoding::buffer_type(ptr))) {}
+
     /**
      * Obtain a pointer to the underlying encoded code unit sequence
      */
@@ -119,7 +125,7 @@ private:
 
     template <typename DestEncoding>
     buffer_type_t<DestEncoding> _encode(tag<DestEncoding>) const {
-        return DestEncoding::template encode_from<internal_encoding>(_buffer);
+        return neo::encoder<internal_encoding, DestEncoding>::encode(_buffer);
     }
 
 public:
