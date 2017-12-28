@@ -170,10 +170,13 @@ private:
             Alloc::deallocate(_alloc,
                               _dynamic_as_char_ptr(),
                               // The size hint. Add the size of the string.
-                              _content.dynamic->size + sizeof(dynamic_data));
+                              (_content.dynamic->size + sizeof(value_type)) + sizeof(dynamic_data));
             // Reset the dynamic data, we aren't using it anymore
             _content.dynamic = nullptr;
         }
+        _mode = small;
+        _content.small.size = 0;
+        _content.small.arr[0] = value_type(0);
     }
 
     /**
@@ -199,6 +202,7 @@ private:
         _content.dynamic = nullptr;
         _mode = small;
         _content.small.size = 0;
+        _content.small.arr[0] = value_type(0);
         return ptr;
     }
 
@@ -211,7 +215,7 @@ private:
         // since zero-sized arrays are not valid C++. We use the extra
         // element to store the null terminator.
         _content.dynamic
-            = reinterpret_cast<dynamic_data*>(Alloc::allocate(_alloc, sizeof(dynamic_data) + size));
+            = reinterpret_cast<dynamic_data*>(Alloc::allocate(_alloc, sizeof(dynamic_data) + (size * sizeof(value_type))));
         // Initialize the dynamic data
         _content.dynamic->refs = 1;                   // One reference
         _content.dynamic->size = size;                // Size of string
@@ -262,7 +266,7 @@ public:
      * string literal.
      */
     template <std::size_t N>
-    code_unit_buffer(const value_type (&arr)[N]) noexcept
+    explicit code_unit_buffer(const value_type (&arr)[N]) noexcept
         : code_unit_buffer(arr, N - 1, from_literal_tag{}) {
     }
 
@@ -287,6 +291,9 @@ public:
             ++first;
         }
     }
+
+    explicit code_unit_buffer(const_pointer ptr, allocator_type alloc = allocator_type())
+        : code_unit_buffer(ptr, ptr + std::char_traits<value_type>::length(ptr), alloc) {}
 
     /**
      * Copy the buffer. Defined in terms of copy-assignment
