@@ -1,7 +1,7 @@
 #ifndef NEO_UNICODE_ENCODINGS_WIDE_HPP_INCLUDED
 #define NEO_UNICODE_ENCODINGS_WIDE_HPP_INCLUDED
 
-#ifdef _WIN23
+#ifdef _WIN32
 #include "utf16.hpp"
 #else
 #include "utf32.hpp"
