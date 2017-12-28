@@ -281,7 +281,11 @@ public:
         const auto size = std::distance(first, last);
         auto wr_ptr = _prepare_storage(size);
         // Copy in the data:
-        std::copy(first, last, wr_ptr);
+        while (first != last) {
+            *wr_ptr = *first;
+            ++wr_ptr;
+            ++first;
+        }
     }
 
     /**
