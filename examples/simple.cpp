@@ -3,7 +3,7 @@
 
 int main() {
     neo::unicode u = "Meow";
+    // Automatically output in the stream's encoding
     std::wcout << u << '\n';
-    // std::cout << u << '\n';
     return 0;
 }

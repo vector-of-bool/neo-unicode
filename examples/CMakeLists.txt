@@ -1,0 +1,15 @@
+function(_add_example name)
+    add_executable(${name} ${name}.cpp)
+    target_link_libraries(${name} PRIVATE neo::unicode)
+    add_test(cpp.example.${name} ${name})
+endfunction()
+
+_add_example(simple)
+
+add_executable(win-ansi win.cpp)
+add_executable(win-uni win.cpp)
+target_compile_definitions(win-uni PRIVATE _UNICODE)
+target_link_libraries(win-ansi PRIVATE neo::unicode)
+target_link_libraries(win-uni PRIVATE neo::unicode)
+add_test(cpp.example.win-ansi win-ansi)
+add_test(cpp.example.win-uni win-uni)
