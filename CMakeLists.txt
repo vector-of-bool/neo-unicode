@@ -9,6 +9,7 @@ include(CTest)
 enable_testing()
 
 include(utf8rewind.cmake)
+include(nonius.cmake)
 
 add_subdirectory(source)
 add_subdirectory(examples)

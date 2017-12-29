@@ -36,7 +36,8 @@
                 "/usr/include",
                 "${workspaceRoot}",
                 "${workspaceRoot}/source",
-                "${workspaceRoot}/extern/utf8rewind/include/utf8rewind"
+                "${workspaceRoot}/extern/utf8rewind/include/utf8rewind",
+                "${workspaceRoot}/extern/nonius"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",
