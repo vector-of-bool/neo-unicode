@@ -118,6 +118,7 @@ private:
         std::atomic<std::size_t> refs;
         // Size is the length of the string
         size_type size;
+        double _align;
         // The buffer lies here
         value_type arr[1];
     };
@@ -164,7 +165,7 @@ private:
      */
     void _release_dynamic() noexcept {
         assert(_mode == dynamic);
-        auto old_refs = _content.dynamic->refs.fetch_sub(1);
+        auto old_refs = _content.dynamic->refs.fetch_sub(1, std::memory_order_relaxed);
         if (old_refs == 1) {
             // No more references to our dynamic data. Free the data
             Alloc::deallocate(_alloc,
@@ -214,12 +215,12 @@ private:
         // because the struct array already has a length of 1 to start with,
         // since zero-sized arrays are not valid C++. We use the extra
         // element to store the null terminator.
-        _content.dynamic
-            = reinterpret_cast<dynamic_data*>(Alloc::allocate(_alloc, sizeof(dynamic_data) + (size * sizeof(value_type))));
+        _content.dynamic = reinterpret_cast<dynamic_data*>(
+            Alloc::allocate(_alloc, sizeof(dynamic_data) + (size * sizeof(value_type))));
         // Initialize the dynamic data
-        _content.dynamic->refs = 1;                   // One reference
-        _content.dynamic->size = size;                // Size of string
-        _content.dynamic->arr[size] = value_type(0);  // Add null terminator
+        _content.dynamic->refs.store(1, std::memory_order_relaxed);  // One reference
+        _content.dynamic->size = size;                               // Size of string
+        _content.dynamic->arr[size] = value_type(0);                 // Add null terminator
     }
 
     value_type* _prepare_storage(size_type size) {
@@ -282,14 +283,10 @@ public:
     template <typename Iterator>
     code_unit_buffer(Iterator first, Iterator last, allocator_type alloc = allocator_type())
         : _alloc(alloc) {
+        // Copy in the data:
         const auto size = std::distance(first, last);
         auto wr_ptr = _prepare_storage(size);
-        // Copy in the data:
-        while (first != last) {
-            *wr_ptr = *first;
-            ++wr_ptr;
-            ++first;
-        }
+        std::char_traits<T>::copy(wr_ptr, first, size);
     }
 
     template <typename CharPointer,
@@ -334,7 +331,7 @@ public:
         if (other._mode == dynamic) {
             // Take the other ones dynamic data and add a reference
             _content.dynamic = other._content.dynamic;
-            _content.dynamic->refs++;
+            _content.dynamic->refs.fetch_add(1, std::memory_order_relaxed);
         } else if (other._mode == literal) {
             // Simple
             _content.literal = other._content.literal;
