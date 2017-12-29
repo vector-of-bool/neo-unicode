@@ -292,8 +292,11 @@ public:
         }
     }
 
-    explicit code_unit_buffer(const_pointer ptr, allocator_type alloc = allocator_type())
-        : code_unit_buffer(ptr, ptr + std::char_traits<value_type>::length(ptr), alloc) {}
+    template <typename CharPointer,
+              typename = std::enable_if_t<std::is_convertible<CharPointer, const_pointer>::value>>
+    explicit code_unit_buffer(CharPointer ptr, allocator_type alloc = allocator_type())
+        : code_unit_buffer(ptr, ptr + std::char_traits<value_type>::length(ptr), alloc) {
+    }
 
     /**
      * Copy the buffer. Defined in terms of copy-assignment
