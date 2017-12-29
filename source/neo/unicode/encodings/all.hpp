@@ -7,4 +7,6 @@
 #include "utf32.hpp"
 #include "wide.hpp"
 
+#include "native.hpp"
+
 #endif // NEO_UNICODE_ENCODINGS_ALL_HPP_INCLUDED

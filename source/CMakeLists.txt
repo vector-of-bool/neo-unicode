@@ -6,6 +6,7 @@ add_library(unicode
     neo/unicode/encodings/encodings.hpp
     neo/unicode/encodings/utf8.hpp
     neo/unicode/encodings/utf16.hpp
+    neo/unicode/encodings/utf16.cpp
     neo/unicode/encodings/utf32.hpp
     neo/unicode/encodings/wide.hpp
     neo/unicode/encodings/wide.cpp
